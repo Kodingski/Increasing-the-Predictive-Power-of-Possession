@@ -1,7 +1,7 @@
 # Increasing-the-Predictive-Power-of-Possession
 
 This repository provides the code used in my thesis project "Increasing the Predictive Power of the Possession Metric in Football by Adding Spatio-temporal Context" 
-submitted for the degree Master of ScienceStatistics: Data Science at Leiden University.
+submitted for the degree Master of Science Statistics: Data Science at Leiden University.
 
 ## Abstract:
 In recent years, statistics play an increasing role in professional football.
