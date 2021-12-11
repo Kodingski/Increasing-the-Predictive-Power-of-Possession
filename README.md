@@ -15,6 +15,9 @@ Our metric holds higher predictive power than the traditional metric.
 To demonstrate the potential of this work for both analysts and journalists, 
 we analyze a teams performance over a whole season as well as individual match performances using the metric.
 
-\textbf{Keywords:} football, soccer, possession, event data, spatio-temporal data, match status, match-up balance, kernel density estimation, k-means clustering, voronoi cells
+**Keywords:** football, soccer, possession, event data, spatio-temporal data, match status, match-up balance, kernel density estimation, k-means clustering, voronoi cells
 
 The PDF containing the full thesis can be found in this repository.
+
+## Data Source and Preprocessing
+
