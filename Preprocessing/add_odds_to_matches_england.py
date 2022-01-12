@@ -136,19 +136,19 @@ matches['edgeAwayTeam'].hist()
 
 
 #%%add labels
-def add_matchup_balance(row):
-    home_edge = row['edgeHomeTeam']
-    
-    if home_edge < -0.1:
-        return 'away_favored'        
-    
-    if -0.1 < home_edge < 0.1:
-        return 'even'
-    if home_edge > 0.1:
-        return 'home_favored'
-
-
-matches['muBalance'] = matches.apply(add_matchup_balance, axis = 1)
+#def add_matchup_balance(row):
+#    home_edge = row['edgeHomeTeam']
+#    
+#    if home_edge < -0.1:
+#        return 'away_favored'        
+#    
+#    if -0.1 < home_edge < 0.1:
+#        return 'even'
+#    if home_edge > 0.1:
+#        return 'home_favored'
+#
+#
+#matches['muBalance'] = matches.apply(add_matchup_balance, axis = 1)
 
 #%%save with joined odds
 matches.to_json(f"data\matches\matches_{country}_odds.json")
