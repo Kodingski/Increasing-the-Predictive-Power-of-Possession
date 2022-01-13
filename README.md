@@ -21,3 +21,10 @@ The PDF containing the full thesis can be found in this repository.
 
 ## Data Source and Preprocessing
 
+The code used to preprocess the raw data provided by XXXXX is provided, but for convenience, the version of the data set used in this thesis is provided here.
+Download the data, put it in folder data and you are good to go. (If you want it in another folder, adjust path in utils/utils.py)
+
+## Structure
+
+The files are named by the chapters and sections which results they reproduce.
+
