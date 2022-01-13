@@ -22,12 +22,34 @@ from scipy import optimize
 from scipy.integrate import quad
 import matplotlib.pyplot as plt 
 
+
 ACCURATE_PASS = 1801
 EVENT_TYPES = ['Duel', 'Foul', 
              'Offside', 'Shot']
 
 TOURNAMENTS=['Italy','England','Germany', 'France', 
              'Spain', 'European_Championship','World_Cup']
+
+
+path = 'Data/preprocessed/'
+def load_passes(path = path, countries = ['Germany', 'Spain',
+                                   'Italy', 'England', 'France']):    
+    #load data, merge and reduce to passes
+    events = []
+    
+    for country in countries:
+        events_country = pd.read_json(rf'{path}events_{country}_thesis.json')
+        events_country['country'] = country
+        events.append(events_country)
+    
+    del events_country
+    
+    events = pd.concat(events, axis=0, ignore_index=True)
+
+    # reduce to passes for quicker computation
+    passes = events[events['eventName'] == 'Pass']
+    return(passes)
+
 
 data_folder='data/'
 def load_public_dataset(data_folder=data_folder, tournament='Italy'):

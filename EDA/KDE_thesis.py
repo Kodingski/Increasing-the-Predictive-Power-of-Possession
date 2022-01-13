@@ -5,7 +5,7 @@ Created on Thu Sep 23 11:00:05 2021
 @author: timsc
 """
 
-#%%
+#%%imports
 import numpy as np
 import pandas as pd
 import scipy.stats
@@ -15,7 +15,13 @@ from utilities.utils import *
 from utilities.plot_utils import *
 from utilities.metrics import *
 
-#%%
+
+#%% load data and reduce to passes played in even matches
+passes = load_passes()
+passes_even = passes.loc[passes['muBalance'] == 'even']
+
+
+#%%define functions used in this chapter
 def plot_kde_event_on_field(data, sample_size=1000000, event = 'Pass', sub_events = False):
     """
     Generate density plots on the field for each event type
@@ -75,34 +81,6 @@ def plot_kde_event_on_field(data, sample_size=1000000, event = 'Pass', sub_event
             plt.show()
         
 
-#%% load data, merge and reduce to passes
-countries = ['Germany', 'Spain', 'Italy', 'England', 'France']
-
-#even_events = []
-events = []
-
-for country in countries:
-    events_country = pd.read_json(f'data/preprocessed/events_{country}_preprocessed.json')
-    events.append(events_country)
-
-del events_country
-
-events = pd.concat(events, axis=0, ignore_index=True)
-
-passes = events[events['eventName'] == 'Pass']
-
-#%%
-ratio = 0.5
-
-passes_unique = passes.drop_duplicates(subset = 'matchId')
-passes_unique['matchBalance'] = np.abs((passes_unique['percHome'] - (passes_unique['percAway'] + 0.15)))
-passes_unique_sorted_even = passes_unique.sort_values(axis = 0, by = 'matchBalance')
-passes_unique_ratio = passes_unique_sorted_even.head(int(len(passes_unique_sorted_even)*ratio))
-matches_even = pd.Series(passes_unique_ratio['matchId'].unique())
-passes_even = passes.loc[passes['matchId'].isin(matches_even)]
-#%%
-plot_kde_event_on_field(passes_even, sample_size=100000000)
-#%%
 def calc_kde(data, sample_size=10000, event = 'Pass', sub_events = False):
     """
     Generate kernel density estimates for each event type
@@ -141,15 +119,31 @@ def calc_kde(data, sample_size=10000, event = 'Pass', sub_events = False):
 
     return(kde_winner, hist_winner, kde_loser, hist_loser)
 
-#%%
+
+def get_rgb(weight):
+    #move weight into range of colormap by using sigmoid
+    weight_stan = 1/(1+ np.exp(-(weight*20000)))
+    return plt.cm.RdYlGn(weight_stan)
+
+
+#%% Create Figure 4.4 (KDE Winners and Losers seperately)
+#Sample size was set very high for final thesis run for maximal stability,
+#for quicker results put to default
+plot_kde_event_on_field(passes_even, sample_size=100000000, sub_events=False)
+
+
+
+#%% Create Figure 4.5 (Difference in KDES Winners and Losers)
 kde_winner, hist_winner, kde_loser, hist_loser = calc_kde(passes_even, sample_size = 1000000)
 X, Y = np.mgrid[0:100:100j, 0:100:100j]
 positions = np.vstack([X.ravel(), Y.ravel()])
+
+#reshape to format of pitch
 estimates_winner = np.reshape(kde_winner(positions).T, X.shape)
 estimates_loser = np.reshape(kde_loser(positions).T, X.shape)
 
-#%%
 fig, ax = pitch()
+
 plt.imshow(np.rot90(estimates_winner - estimates_loser), cmap = 'RdYlGn',
           extent=[0, 100, 0, 100], aspect = 0.7)
 plt.xlim(-1, 101)
@@ -159,41 +153,12 @@ fig.tight_layout()
 
 plt.show()
 
-#%% For subtypes
+
+#%% Create Figures Appendix B (subtypes)
+#Sample size was set very high for final thesis run for maximal stability,
+#for quicker results put to default 
 plot_kde_event_on_field(passes_even, sample_size=100000000, sub_events=True)
 
-
-
-#%%
-def get_rgb(weight):
-    #move weight into range of colormap by using sigmoid
-    weight_stan = 1/(1+ np.exp(-(weight*20000)))
-    return plt.cm.RdYlGn(weight_stan)
-#%%
-
-sub_passes = passes.groupby(['subEventName'])
-            
-for name_sub, subgroup in sub_passes:
-    print(name_sub)
-    kde_winner, hist_winner, kde_loser, hist_loser = calc_kde(subgroup, sample_size = 1000000)
-    X, Y = np.mgrid[0:100:100j, 0:100:100j]
-    positions = np.vstack([X.ravel(), Y.ravel()])
-    estimates_winner = np.reshape(kde_winner(positions).T, X.shape)
-    estimates_loser = np.reshape(kde_loser(positions).T, X.shape)
-    
-    diff = (estimates_winner - estimates_loser)
-    diff[np.abs(diff) < 0.00000001] = 0
-
-    
-    fig, ax = pitch()
-    plt.imshow(get_rgb(np.rot90(diff)),
-              extent=[0, 100, 0, 100], aspect = 0.7, norm = None)
-    plt.xlim(-1, 101)
-    plt.ylim(-1, 101)
-    plt.axis('off')
-    fig.tight_layout()
-    
-    plt.show()
 
 
 

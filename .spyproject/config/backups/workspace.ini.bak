@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['C:\\Users\\timsc\\.spyder-py3\\temp.py', 'Preprocessing\\preprocess_league.py', 'Preprocessing\\team_name_mapping\\team_name_mapping_Spain.py', 'Preprocessing\\add_odds_to_matches_england.py', 'create_github_data.py']
+recent_files = ['C:\\Users\\timsc\\.spyder-py3\\temp.py', 'create_github_data.py', 'Model Fitting\\fitting_even.py', 'Model Fitting\\fitting_thesis.py', 'Model Fitting\\test_even.py', 'Preprocessing\\preprocess_league.py']
 
