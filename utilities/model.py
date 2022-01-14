@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 16 12:28:56 2021
+Created on Fri Jan 14 16:34:18 2022
 
 @author: timsc
 """
@@ -24,9 +24,7 @@ from shapely.geometry.polygon import Polygon
 
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
 
-#%%
 def mirror_passes(passes):
     passes_mirrored = passes.copy()
     passes_mirrored['start_y'] = 100 - passes_mirrored['start_y']
@@ -173,86 +171,69 @@ def plot_passes_on_zones(kmeans, k, passes_match, mirror = False):
         fig.tight_layout()
         plt.show()
 
-#%% load data, merge and reduce to passes
-countries = ['Germany', 'Spain', 'Italy', 'England', 'France']
-
-#even_events = []
-events = []
-
-for country in countries:
-    events_country = pd.read_json(f'data/preprocessed/events_{country}_preprocessed.json')
-    events.append(events_country)
-
-del events_country
-
-events = pd.concat(events, axis=0, ignore_index=True)
-
-#%%
-passes = events[events['eventName'] == 'Pass']
-#%%
-passes_mirrored = mirror_passes(passes)
-passes_mirrored = passes_mirrored[passes_mirrored['start_y'] <= 50]
-
-#%% fit k means to plot zones later
-kmeans_10 = KMeans(n_clusters = 10, max_iter = 500).fit(passes_mirrored[['start_x', 'start_y']])
-
-
-
-#%%ID of Match Eintracht Bremen: 2516834
-passes_match_example = passes_mirrored[passes_mirrored['matchId'] == 2516834]
-passes_match_example['Team'] = 'Home'
-passes_match_example.loc[passes_match_example['teamId'] == 2443, 'Team'] = 'Away'
-#%%
-plot_passes_on_zones(kmeans_10, 10, passes_match_example, mirror = False)
-
-#%%
-def get_mean_poss_vector(passes_train, k, status = True):
-    
-    passes_home = passes_train[passes_train['home'] == passes_train['teamId']]
-    passes_away = passes_train[passes_train['home'] != passes_train['teamId']]
-    
-    
-    if status:
-        pass_count_per_zone_per_status_home = passes_home.groupby(['status','zone'])['eventId'].count().values
-        #rearrange to have trailing first
-        pass_count_per_zone_per_status_home = np.hstack(
-                                        (pass_count_per_zone_per_status_home[(2*k):(3*k)],
-                                        pass_count_per_zone_per_status_home[0:(2*k)])
-                                        )
-        
-        
-        pass_count_per_zone_per_status_away = passes_away.groupby(['status','zone'])['eventId'].count()
-        #rearrange to have trailing first
-        pass_count_per_zone_per_status_away = np.hstack(
-                                        (pass_count_per_zone_per_status_away[(k):(2*k)],
-                                        pass_count_per_zone_per_status_away[0:(k)],
-                                        pass_count_per_zone_per_status_away[(2*k):(3*k)])
-                                        )
-    
-        mean_poss_vector = pass_count_per_zone_per_status_home / (pass_count_per_zone_per_status_home +
-                                                             pass_count_per_zone_per_status_away)
-        
-    else:
-        pass_count_per_zone_home = passes_home.groupby(['zone'])['eventId'].count().values
-        pass_count_per_zone_away = passes_away.groupby(['zone'])['eventId'].count().values
-        
-        mean_poss_vector = pass_count_per_zone_home / (pass_count_per_zone_home +
-                                                             pass_count_per_zone_away)
-
-    return mean_poss_vector
-
-#%%
-passes_mirrored['zone'] = kmeans_10.predict(passes_mirrored[['start_x','start_y']])
-mean_poss_vector = get_mean_poss_vector(passes_mirrored, 10, status = False)
-
-
-#%%
-
-def get_rgb(weight):
+def get_rgb_model(weight):
     #move weight into range of colormap by using sigmoid
     weight_stan = 1/(1+ np.exp(-weight*2))
     return plt.cm.RdYlGn(weight_stan)
 
+def plot_poss(kmeans, k, vector, status = False, colors = False):
+        
+        centroids = kmeans.cluster_centers_
+    
+
+        vor = Voronoi(centroids)
+        zones = voronoi_polygons(centroids)
+        
+
+        offsets = [0*k]
+        
+        color = 'white'
+
+        if status:
+            offsets = [0*k, 1*k, 2*k]
+
+
+        for offset in offsets:
+                
+            fig, ax = pitch()
+            voronoi_plot_2d(vor, ax = ax, point_size = 0)
+            for i_, zone in enumerate(zones):
+                if colors:
+                    color = get_rgb_model(vector[i_+offset]*5)
+                
+                colored_cell = patches.Polygon(zone,
+                                       linewidth=1, 
+                                       alpha=1,
+                                       facecolor = color,
+                                       edgecolor="black"
+                                       )
+                ax.add_patch(colored_cell)
+                if i_ == 4:
+                    plt.text(centroids[i_,0]-8.5, centroids[i_,1]-8,
+                             np.round(((vector[i_+offset])),2),
+                             size = 18)                
+                
+                elif i_ == 6:
+                    plt.text(centroids[i_,0]+ 1.5, centroids[i_,1],
+                             np.round(((vector[i_+offset])),2),
+                             size = 18)                
+    
+                else:
+                    plt.text(centroids[i_,0]-1, centroids[i_,1],
+                             np.round(((vector[i_+offset])),2),
+                             size = 18)                
+    
+
+            
+            plt.axhline(50, color = 'black')
+            
+            plt.xlim(-1,101)
+            plt.ylim(-1,51)
+            plt.axis('off')
+    
+            fig.tight_layout()
+            plt.show()
+            
 def plot_poss(kmeans, k, vector, status = False, colors = False):
         
         centroids = kmeans.cluster_centers_
@@ -310,22 +291,38 @@ def plot_poss(kmeans, k, vector, status = False, colors = False):
     
             fig.tight_layout()
             plt.show()
-            
 
-#%%
-example_poss_per_zone = mean_poss_vector + np.random.normal(0,0.15, size = 10)
-plot_poss(kmeans_10, 10, example_poss_per_zone)
-plot_poss(kmeans_10, 10, mean_poss_vector)
-plot_poss(kmeans_10, 10, example_poss_per_zone - mean_poss_vector, colors = True)
+def get_mean_poss_vector(passes_train, k, status = True):
+    
+    passes_home = passes_train[passes_train['home'] == passes_train['teamId']]
+    passes_away = passes_train[passes_train['home'] != passes_train['teamId']]
+    
+    
+    if status:
+        pass_count_per_zone_per_status_home = passes_home.groupby(['status','zone'])['id'].count().values
+        #rearrange to have trailing first
+        pass_count_per_zone_per_status_home = np.hstack(
+                                        (pass_count_per_zone_per_status_home[(2*k):(3*k)],
+                                        pass_count_per_zone_per_status_home[0:(2*k)])
+                                        )
+        
+        
+        pass_count_per_zone_per_status_away = passes_away.groupby(['status','zone'])['id'].count()
+        #rearrange to have trailing first
+        pass_count_per_zone_per_status_away = np.hstack(
+                                        (pass_count_per_zone_per_status_away[(k):(2*k)],
+                                        pass_count_per_zone_per_status_away[0:(k)],
+                                        pass_count_per_zone_per_status_away[(2*k):(3*k)])
+                                        )
+    
+        mean_poss_vector = pass_count_per_zone_per_status_home / (pass_count_per_zone_per_status_home +
+                                                             pass_count_per_zone_per_status_away)
+        
+    else:
+        pass_count_per_zone_home = passes_home.groupby(['zone'])['id'].count().values
+        pass_count_per_zone_away = passes_away.groupby(['zone'])['id'].count().values
+        
+        mean_poss_vector = pass_count_per_zone_home / (pass_count_per_zone_home +
+                                                             pass_count_per_zone_away)
 
-#%%repeat for status controlled
-
-mean_poss_vector_status = get_mean_poss_vector(passes_mirrored, 10, status = True)
-
-
-#%%
-example_poss_per_zone_per_status = mean_poss_vector_status + np.random.normal(0,0.15, size = 30)
-plot_poss(kmeans_10, 10, example_poss_per_zone_per_status, status = True)
-plot_poss(kmeans_10, 10, mean_poss_vector_status, status = True)
-plot_poss(kmeans_10, 10, example_poss_per_zone_per_status - mean_poss_vector_status, 
-          status = True, colors = True)
+    return mean_poss_vector
