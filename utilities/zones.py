@@ -24,6 +24,12 @@ def mirror_passes(passes):
     passes_merged = passes.append(passes_mirrored)
     return(passes_merged)
 
+def get_rgb_mean(weight):
+    #move weight into range of colormap by using sigmoid
+    #weight_stan = 1/(1+ np.exp(-weight*2))
+    return plt.cm.RdYlGn(((weight-0.5)*6)+0.5)
+
+
 def voronoi_finite_polygons_2d(vor, radius=None):
     """
     Reconstruct infinite voronoi regions in a 2D diagram to finite
@@ -251,3 +257,179 @@ def get_rect_zone_center_coords(k_root, k):
             
 
     return(zone_centers, zone_anchors)
+
+def plot_mean_poss_per_zone(mean_poss_vector, kmeans, k):
+        
+        centroids_right = kmeans.cluster_centers_
+        centroids_left = centroids_right.copy()
+        centroids_left[:,1] = 100 - centroids_left[:,1]
+        centroids = np.vstack((centroids_left,centroids_right))
+
+
+        vor = Voronoi(centroids)
+        zones = voronoi_polygons(centroids)
+        
+        coeffs = np.hstack((mean_poss_vector,mean_poss_vector))
+
+        
+
+
+        
+ 
+            
+        fig, ax = pitch()
+        voronoi_plot_2d(vor, ax = ax, point_size = 0)
+        for i_, zone in enumerate(zones):
+            
+            colored_cell = patches.Polygon(zone,
+                                   linewidth=1, 
+                                   alpha=1,
+                                   facecolor=get_rgb_mean((coeffs[i_])),
+                                   edgecolor="black"
+                                   )
+            ax.add_patch(colored_cell)
+      
+        
+            if i_ == 3:
+                plt.text(centroids[i_,0]+1, centroids[i_,1],
+                             np.round(((coeffs[i_])),2),
+                             size = 16)  
+        
+            elif i_ == 4:
+                plt.text(centroids[i_,0]-5, centroids[i_,1],
+                             np.round(((coeffs[i_])),2), size = 16)  
+                
+            elif i_ == 13:
+                plt.text(centroids[i_,0] +1, centroids[i_,1],np.round(((coeffs[i_])),2),
+                     size = 16)  
+                
+            elif i_ == 14:
+                plt.text(centroids[i_,0] -5, centroids[i_,1],np.round(((coeffs[i_])),2),
+                     size = 16)  
+            else:
+                plt.text(centroids[i_,0], centroids[i_,1],np.round(((coeffs[i_])),2),
+                     size = 16)  
+                
+        plt.xlim(-1,101)
+        plt.ylim(-1,101)
+        plt.axis('off')
+        fig.tight_layout()
+        plt.show()
+
+def plot_mean_poss_per_rect_zone(mean_poss_vector, k):
+    
+    if k == 1:
+        k_root = 1
+    elif k == 6:
+        k_root = 3
+    elif k == 15:
+        k_root = 5
+    else:
+        k_root = int(np.sqrt(k*2))
+    
+    
+    center_coords, anchor_coords = get_rect_zone_center_coords(k_root, k)
+    center_coords_mirrored, anchor_coords_mirrored = center_coords.copy(), anchor_coords.copy()
+    center_coords_mirrored[:,1] = 100- center_coords_mirrored[:,1] 
+    anchor_coords_mirrored[:,1] = 100 - anchor_coords_mirrored[:,1] - (100/k_root)
+
+    coeffs = mean_poss_vector
+
+    
+
+    fig, ax = pitch()
+    plt.xlim(-1,101)
+    plt.ylim(-1,101)
+    plt.axis('off')
+    
+    
+    for i_ in range(len(center_coords)):
+        
+        rectangle = patches.Rectangle(anchor_coords[i_],
+                                        100/k_root, 
+                                        100/k_root,
+                                        linewidth = 1,
+                                        alpha=1,
+                                        facecolor = get_rgb_mean(coeffs[i_]),
+                                        edgecolor="black",
+                                        )
+        ax.add_patch(rectangle)
+        ax.plot(anchor_coords[i_,0], anchor_coords[i_,1]+rectangle.get_height(), '.', markersize = 13, color = 'tab:orange')
+        
+        ax.plot(anchor_coords[i_,0]+rectangle.get_width(), anchor_coords[i_,1], '.', markersize = 13, color = 'tab:orange')
+
+        ax.plot(anchor_coords[i_,0], anchor_coords[i_,1], '.', markersize = 13, color = 'tab:orange')
+        
+
+        plt.text(center_coords[i_,0] - 3.5, center_coords[i_,1],np.round(((coeffs[i_])),2), size = 16)                
+
+                
+        
+        rectangle_mirrored = patches.Rectangle(anchor_coords_mirrored[i_],
+                            100/k_root, 
+                            100/k_root,
+                            alpha=1,
+                            facecolor =get_rgb_mean(coeffs[i_]),
+                            edgecolor="black"
+                            )
+        ax.add_patch(rectangle_mirrored)  
+        
+        ax.plot(anchor_coords_mirrored[i_,0]+rectangle_mirrored.get_width(), 
+                anchor_coords_mirrored[i_,1]+rectangle_mirrored.get_height(), '.', markersize = 13, color = 'tab:orange')
+
+        ax.plot(anchor_coords_mirrored[i_,0], anchor_coords_mirrored[i_,1]+rectangle_mirrored.get_height(),
+                '.', markersize = 13, color = 'tab:orange')
+            
+        ax.plot(anchor_coords_mirrored[i_,0]+rectangle_mirrored.get_width(), 
+                anchor_coords_mirrored[i_,1], '.', markersize = 13, color = 'tab:orange')          
+        
+        plt.text(center_coords_mirrored[i_,0] - 3.5, center_coords_mirrored[i_,1],np.round(((coeffs[i_])),2), size = 16)                
+
+        
+    plt.axhline(50, color = 'black')
+
+    plt.xlim(-1,101)
+    plt.ylim(-1,101)
+    plt.axis('off')
+    fig.tight_layout()
+    plt.show()
+    
+def get_mean_poss_per_zone(passes, k, kmeans = False):
+    
+    passes = passes[passes['status'] == 'drawing']
+    
+    if kmeans:
+        passes['zone'] = kmeans.predict(passes[['start_x', 'start_y']])
+    
+       
+    else:    
+        k_root = np.sqrt(k*2)
+        step = 100/k_root   
+        zone = 0
+        
+        for x in np.arange(0, 100, step):
+            for y in np.arange(0, 50, step):
+                
+                x = int(x)
+                y = int(y)
+                    
+                passes.loc[((passes.loc[:, 'start_x'].between(x, x+step)) & (passes.loc[:, 'start_y'].between(y, y+step))) ,'zone'] = zone      
+                zone += 1  
+    
+    
+    
+    passes_winners = passes[passes['outcome'] == 'won']
+    passes_losers = passes[passes['outcome'] == 'lost']
+    
+    pass_count_per_zone_winners = passes_winners.groupby(['zone'])['id'].count().values
+    pass_count_per_zone_losers = passes_losers.groupby(['zone'])['id'].count().values
+    
+    mean_poss_vector = pass_count_per_zone_winners / (pass_count_per_zone_winners +
+                                                         pass_count_per_zone_losers)
+
+    return mean_poss_vector
+
+
+
+
+
