@@ -7,7 +7,6 @@ Created on Thu Sep 23 11:00:05 2021
 
 #%%imports
 import numpy as np
-import pandas as pd
 import scipy.stats
 import seaborn as sns
 import matplotlib as plt

@@ -5,15 +5,8 @@ Created on Sun Mar 28 21:00:05 2021
 @author: timsc
 """
 #%%imports
-import numpy as np
-import pandas as pd
-import scipy.stats
-import seaborn as sns
-import matplotlib as plt
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
-
 
 #%% load data and reduce to passes played in even matches
 passes = load_passes()

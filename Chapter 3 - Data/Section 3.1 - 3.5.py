@@ -6,12 +6,8 @@ Created on Sat Aug  7 12:18:34 2021
 """
 
 #%% imports
-import numpy as np
-import pandas as pd
-
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
 
 #%% load  events
 events = load_events()

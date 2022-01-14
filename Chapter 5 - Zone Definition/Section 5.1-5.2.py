@@ -6,18 +6,14 @@ Created on Tue Sep 14 09:23:14 2021
 """
 
 #%% imports
-import numpy as np
-import pandas as pd
-import scipy.stats
+
 import seaborn as sns
 import matplotlib as plt
-import matplotlib.patches as patches
-import random
+
 
 
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
 #For readibility purposes functions to produce zones and plots can be found in
 #utilities.zones and are imported here
 from utilities.zones import *
