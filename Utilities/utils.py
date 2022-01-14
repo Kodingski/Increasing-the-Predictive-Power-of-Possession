@@ -32,6 +32,26 @@ TOURNAMENTS=['Italy','England','Germany', 'France',
 
 
 path = 'Data/preprocessed/'
+def load_events(path = path, countries = ['Germany', 'Spain',
+                                   'Italy', 'England', 'France']):    
+    #load data, merge and reduce to passes
+    events = []
+    
+    for country in countries:
+        events_country = pd.read_json(rf'{path}events_{country}_thesis.json')
+        events_country['country'] = country
+        events.append(events_country)
+    
+    del events_country
+    
+    events = pd.concat(events, axis=0, ignore_index=True)
+
+    # reduce to passes for quicker computation
+    return(events)
+
+
+
+
 def load_passes(path = path, countries = ['Germany', 'Spain',
                                    'Italy', 'England', 'France']):    
     #load data, merge and reduce to passes
