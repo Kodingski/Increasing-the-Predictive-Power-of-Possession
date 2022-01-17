@@ -257,7 +257,7 @@ def plot_poss(kmeans, k, vector, status = False, colors = False):
             voronoi_plot_2d(vor, ax = ax, point_size = 0)
             for i_, zone in enumerate(zones):
                 if colors:
-                    color = get_rgb(vector[i_+offset]*5)
+                    color = get_rgb_model(vector[i_+offset]*5)
                 
                 colored_cell = patches.Polygon(zone,
                                        linewidth=1, 
