@@ -11,6 +11,7 @@ import pandas as pd
 
 from sklearn.model_selection import KFold
 from utilities.fitting import * 
+from utilities.utils import *
 from utilities.zones import *
 
 import warnings
@@ -22,7 +23,7 @@ passes = load_passes()
 
 #%%mirror passes and reduce to bottom half
 passes = mirror_passes(passes)
-passes= passes_mirrored[passes_mirrored['start_y'] <= 50]
+passes= passes[passes['start_y'] <= 50]
 
 #%% define outer and inner cv
 #number of splits inner outer
@@ -34,29 +35,31 @@ outer_cv = KFold(n_splits = n_outer_splits, shuffle = True, random_state = 420)
 inner_cv = KFold(n_splits = n_inner_splits, shuffle = True, random_state = 420)
 
 #%%  prepare dictionaries to store results in 
+#store vor train results
 models = {}
 scores = {}
 scores_averages = {}
 
+#store rect train results
 models_rect = {}
 scores_rect = {}
 scores_averages_rect = {}
 
+#store vor test results
 best_params = {}
 best_models = {}
 results_best_models = {}
 kmeans_best_models = {}
 
-#store rect results
+#store rect test results
 best_params_rect = {}
 best_models_rect = {}
 results_best_models_rect = {}
 
-#store baseline results
+#store baseline test results
 results_baseline_raw = {}
 models_baseline_raw = {}
 params_baseline_raw = {}
-
 results_baseline_status = {}
 models_baseline_status = {}
 params_baseline_status = {}
@@ -64,6 +67,9 @@ params_baseline_status = {}
 #%%Run N-CV 
 #As there are 25*5*5 models to be fit and evaluated, 
 #only run this code on good hardware and with sufficient time.
+
+#extract match ids to split on 
+matches = pd.Series(passes['matchId'].unique())
 
 #number of zones to check for and step size for k
 ks = 20
