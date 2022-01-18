@@ -111,14 +111,18 @@ for train_ix, test_ix in outer_cv.split(matches):
         
         models, scores, scores_average = train_fold(passes_train, passes_val, 
                                                     models, scores, scores_average, 
-                                                    ) 
+                                                    i, ii, ks, k_step,
+                                                    n_outer_splits, n_inner_splits) 
         
         passes_train = passes.loc[passes['matchId'].isin(inner_train_matches)]
         passes_val = passes.loc[passes['matchId'].isin(val_matches)]
         
         models_rect, scores_rect, scores_average_rect = train_fold(passes_train, passes_val, 
                                                     models_rect, scores_rect, 
-                                                    scores_average_rect, zone_type = 'Rectangular'
+                                                    scores_average_rect, 
+                                                    i, ii, ks, k_step,
+                                                    n_outer_splits, n_inner_splits,
+                                                    zone_type = 'Rectangular'
                                                     ) 
         
         ii += 1
@@ -177,6 +181,6 @@ for train_ix, test_ix in outer_cv.split(matches):
 
     i += 1
     
-    # save results
+    # save results in working directory
     save_results()       
 

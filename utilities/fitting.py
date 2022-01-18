@@ -29,7 +29,7 @@ def get_mean_poss_vector(passes_train, k, status = True):
     
     
     if status:
-        pass_count_per_zone_per_status_home = passes_home.groupby(['status','zone'])['eventId'].count().values
+        pass_count_per_zone_per_status_home = passes_home.groupby(['status','zone'])['id'].count().values
         #rearrange to have trailing first
         pass_count_per_zone_per_status_home = np.hstack(
                                         (pass_count_per_zone_per_status_home[(2*k):(3*k)],
@@ -37,7 +37,7 @@ def get_mean_poss_vector(passes_train, k, status = True):
                                         )
         
         
-        pass_count_per_zone_per_status_away = passes_away.groupby(['status','zone'])['eventId'].count()
+        pass_count_per_zone_per_status_away = passes_away.groupby(['status','zone'])['id'].count()
         #rearrange to have trailing first
         pass_count_per_zone_per_status_away = np.hstack(
                                         (pass_count_per_zone_per_status_away[(k):(2*k)],
@@ -49,8 +49,8 @@ def get_mean_poss_vector(passes_train, k, status = True):
                                                              pass_count_per_zone_per_status_away)
         
     else:
-        pass_count_per_zone_home = passes_home.groupby(['zone'])['eventId'].count().values
-        pass_count_per_zone_away = passes_away.groupby(['zone'])['eventId'].count().values
+        pass_count_per_zone_home = passes_home.groupby(['zone'])['id'].count().values
+        pass_count_per_zone_away = passes_away.groupby(['zone'])['id'].count().values
         
         mean_poss_vector = pass_count_per_zone_home / (pass_count_per_zone_home +
                                                              pass_count_per_zone_away)
@@ -86,7 +86,7 @@ def prepare_data(passes_train, mean_poss_vector, mean_poss_vector_raw, index_ser
         for name, passes_per_team_per_status in per_team_per_status:
             team, status = name[0], name[1]
 
-            counts_status = passes_per_team_per_status.groupby(['zone'])['eventId'].count()
+            counts_status = passes_per_team_per_status.groupby(['zone'])['id'].count()
 
             if team == home_team:
                 
@@ -194,7 +194,7 @@ def assign_vor_zones(passes_train, passes_test, k):
 
 
 def train_fold(passes_train, passes_val, models, scores, scores_average, 
-               zone_type = 'Voronoi'):
+               i, ii, ks, k_step, n_outer_splits, n_inner_splits, zone_type = 'Voronoi'):
         
 
     models[i][ii] = {}
@@ -320,7 +320,8 @@ def train_fold(passes_train, passes_val, models, scores, scores_average,
     return (models, scores, scores_average)
 
 
-def find_best_model_outer_fold(scores_average, baseline = False, status_type = False):
+def find_best_model_outer_fold(scores_average, baseline = False, 
+                               status_type = False):
 
     
     best_found = -1000
