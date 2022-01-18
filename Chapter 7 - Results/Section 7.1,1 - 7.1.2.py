@@ -11,7 +11,6 @@ import pandas as pd
 import random
 import copy
 import pickle
-import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -20,27 +19,15 @@ from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression, ElasticNet
 from statsmodels.regression.linear_model import OLS
 from statsmodels.tools import add_constant
-
+from utilities.utils import *
 
 
 import warnings
 warnings.filterwarnings("ignore")
 
-folder_results = 'results/full/'
 
 #%% load all results dicts
-
-files = os.listdir(folder_results)
-results = {}
-
-
-for f in files:
-    if f == 'models.pickle':
-        models = pickle.load(open(folder_results+f, "rb"))
-    else:                        
-        results[str(f.rstrip('.pickle'))] = pickle.load(open(folder_results+f, "rb"))
-
-
+model, results = load_full_results()
 #%%get mean results best models and put results into matrix
 results_matrix = np.zeros((1,6))
 for i, params in enumerate(results['params_baseline_status'].values()):

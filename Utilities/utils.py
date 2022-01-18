@@ -1,6 +1,7 @@
 
 import pandas as pd
 import pickle
+import os
 
 
 
@@ -62,3 +63,15 @@ def load_final_model(path_results = path_results):
 
 
 def load_full_results(path_results = path_results):
+    files = os.listdir(rf'{path_results}full')
+    results = {}
+    
+    
+    for f in files:
+        if f == 'models.pickle':
+            models = pickle.load(open(rf'{path_results}full/{f}', "rb"))
+        else:                        
+            results[str(f.rstrip('.pickle'))] = pickle.load(open(rf'{path_results}full/{f}', "rb"))
+            
+    return(models, results)
+        

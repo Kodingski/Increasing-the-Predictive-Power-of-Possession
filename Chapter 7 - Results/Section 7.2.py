@@ -35,9 +35,10 @@ from statsmodels.tools import add_constant
 
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
 
 
+#%%
+final_model = load_final_model()
 
 #%%plot helpers
 
