@@ -326,3 +326,62 @@ def get_mean_poss_vector(passes_train, k, status = True):
                                                              pass_count_per_zone_away)
 
     return mean_poss_vector
+
+def plot_weights(model, kmeans, k, model_name = str):
+        
+        centroids_right = kmeans.cluster_centers_
+        centroids_left = centroids_right.copy()
+        centroids_left[:,1] = 100 - centroids_left[:,1]
+        centroids = np.vstack((centroids_left,centroids_right))
+
+
+        vor = Voronoi(centroids)
+        zones = voronoi_polygons(centroids)
+        
+        coeffs = model.coef_
+        coeffs = np.hstack((coeffs[0:k],coeffs[0:k], 
+                               coeffs[k:(2*k)],coeffs[k:(2*k)],
+                               coeffs[(2*k):(3*k)],coeffs[(2*k):(3*k)]
+                               ))
+        intercept = model.intercept_
+
+
+        if model_name == 'Raw':
+            offsets = [0*k]
+        else:   
+            offsets = [0*k, 2*k, 4*k]
+        
+        for offset in offsets:   
+            
+            fig, ax = pitch()
+            voronoi_plot_2d(vor, ax = ax, point_size = 0)
+            for i_, zone in enumerate(zones):
+
+                colored_cell = patches.Polygon(zone,
+                                       linewidth=1, 
+                                       alpha=1,
+                                       facecolor=get_rgb_final((coeffs[i_+offset])),
+                                       edgecolor="black"
+                                       )
+                ax.add_patch(colored_cell)
+                if i_ == 3 or i_ == 14:
+                    text_offset = 1.8
+                else:
+                    text_offset = -4
+
+                plt.text(centroids[i_,0] + text_offset, centroids[i_,1],np.round(((coeffs[i_+offset])),2), size = 16)                
+
+                    
+                    
+            plt.xlim(-1,101)
+            plt.ylim(-1,101)
+            plt.axis('off')
+            #plt.suptitle(f'{offset}, k = {k}, model {model_name}', fontsize = 30)
+            #plt.title(f'intercept (home adv.) = {np.round(intercept, 3)}',  fontsize = 20)
+            fig.tight_layout()
+            plt.show()
+            
+def get_rgb_final(weight):
+    #move weight into range of colormap by using sigmoid
+    weight_stan = 1/(1+ np.exp(-weight*2))
+    return plt.cm.RdYlGn(weight_stan)

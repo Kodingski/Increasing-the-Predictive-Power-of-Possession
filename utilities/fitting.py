@@ -464,3 +464,64 @@ def calc_mean_r_squared_outer(best_results):
         
     mean = mean/len(best_results.values())
     print(np.round(mean, 3))
+
+def fit_and_score_even(passes_train_outer, passes_test, best_model):
+    
+    k = best_model[1]
+    model_type = best_model[2]
+    regularization = best_model[3]
+    
+    
+    if best_model[0] == 'Voronoi':
+        passes_train_outer, passes_test, k_means = assign_vor_zones(passes_train_outer,
+                                                                  passes_test,
+                                                                  k)
+        
+    if best_model[0] == 'Rectangular':
+        
+        passes_train_outer, passes_test = assign_rect_zones(passes_train_outer,
+                                                                  passes_test,
+                                                                  k)
+        
+    if best_model[0] == 'Baseline':
+        passes_train_outer, passes_test = assign_rect_zones(passes_train_outer,
+                                                                  passes_test,
+                                                                  k)
+        
+    
+    mean_poss_vector = get_mean_poss_vector(passes_train_outer, k)
+    mean_poss_vector_raw = get_mean_poss_vector(passes_train_outer, k, status = False)
+    
+    index_series = pd.Series(np.zeros(k), index = range(k))
+        
+    X_raw, X, y = prepare_data(passes_train_outer, mean_poss_vector,
+                                      mean_poss_vector_raw, index_series, k)
+    
+    if model_type == 'status':
+        X_model = X
+    if model_type == 'raw':
+        X_model = X_raw
+        
+    if regularization == 'full':
+        model = LinearRegression()
+    else:
+        model = ElasticNet(alpha = regularization/50)
+    
+    #fit model
+    model.fit(X_model, y)
+    
+    #prepare test data
+    X_raw_test, X_test, y_test = prepare_data(passes_test, mean_poss_vector,
+                              mean_poss_vector_raw, index_series, k)
+    if model_type == 'status':
+        X_model_test = X_test
+    if model_type == 'raw':
+        X_model_test = X_raw_test
+        
+    #score model
+    results = model.score(X_model_test, y_test)
+    
+    if best_model[0] == 'Voronoi':
+        return(model, results, k_means)
+    else:
+        return(model,results)

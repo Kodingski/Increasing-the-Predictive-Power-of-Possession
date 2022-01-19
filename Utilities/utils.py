@@ -39,7 +39,7 @@ def load_passes(path_preprocessed = path_preprocessed, countries = ['Germany', '
     events = []
     
     for country in countries:
-        events_country = pd.read_json(rf'{path}events_{country}_thesis.json')
+        events_country = pd.read_json(rf'{path_preprocessed}events_{country}_thesis.json')
         events_country['country'] = country
         events.append(events_country)
     
@@ -74,4 +74,8 @@ def load_full_results(path_results = path_results):
             results[str(f.rstrip('.pickle'))] = pickle.load(open(rf'{path_results}full/{f}', "rb"))
             
     return(models, results)
-        
+
+def load_test_even(path_results = path_results):
+    with open(rf'{path_results}even/test_even.pickle', 'rb') as f:
+       test_even = pickle.load(f)
+    return test_even
