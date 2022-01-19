@@ -1,6 +1,7 @@
 Finish Chapter 7 - Done!
 Do Chapter 8 
 Appendix A
+update mean_poss_vector file
 
 Requirements
 
