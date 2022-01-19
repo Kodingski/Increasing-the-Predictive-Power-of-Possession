@@ -19,15 +19,11 @@ import pickle
 
 from utilities.utils import *
 from utilities.plot_utils import *
+from utilities.model import * 
 
-#%%
+#%%load final model
 final_model = load_final_model()
 
-#%%
+#%%Figure 7.2 - plot final model on pitch
 plot_weights(final_model['model'], final_model['kmeans'], 11, model_name = f'Final Status')
 
-#%%s   
-with open('final_kmeans.pickle', 'wb') as handle:
-    pickle.dump(kmeans, handle, protocol=pickle.HIGHEST_PROTOCOL)
-with open('final_model.pickle', 'wb') as handle:
-    pickle.dump(final_model_s, handle, protocol=pickle.HIGHEST_PROTOCOL) 

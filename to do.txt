@@ -1,8 +1,20 @@
-Finish Chapter 7
-Do Chapter 8
+Finish Chapter 7 - Done!
+Do Chapter 8 
 Appendix A
 
 Requirements
+
+numpy
+pandas
+sklearn
+seaborn
+scipy
+pickle
+shapely
+math
+matplotlib
+fuzzywuzzy
+
 Acknowledgements
 Upload Data 
 
