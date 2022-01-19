@@ -17,14 +17,25 @@ we analyze a teams performance over a whole season as well as individual match p
 
 **Keywords:** football, soccer, possession, event data, spatio-temporal data, match status, match-up balance, kernel density estimation, k-means clustering, voronoi cells
 
-The PDF containing the full thesis can be found in this repository.
+The PDF containing the full thesis report can be found in this repository.
 
-## Data Source and Preprocessing
+## Dependencies
 
-The code used to preprocess the raw data provided by XXXXX is provided, but for convenience, the version of the data set used in this thesis is provided here.
-Download the data, put it in folder data and you are good to go. (If you want it in another folder, adjust path in utils/utils.py)
+
+
+## Data
+The project is based on the data set "A public data set of spatio-temporal match events in soccer competitions." (https://www.nature.com/articles/s41597-019-0247-7)
+The code used to preprocess the raw data provided under the creative commons license into the data set used in this thesis is provided.
+For convenience, the preprocessed version of the data set used in this thesis is provided.
+Additionally, the results of the nested cross-validation in Chapter 7, the postprocessed data used for the application in Chapter 8, as well as the results of the Permutation test in Appendix A are provided here.
+Download the data, put it in folder data and you are good to go!
 
 ## Structure
+The files are named by the chapters and sections of the report which results they reproduce.
+Every Table or Figure used in a section can be reproduced by running the code in the respective file.
 
-The files are named by the chapters and sections which results they reproduce.
+For Chapter 3, 7 and 8 as well as Appendix A there are additional scripts to reproduce the provided data sets (see Data).
+Especially the nested cross-validation is computationally expensive, so only run this code with the given hardware and time.
+
+
 
