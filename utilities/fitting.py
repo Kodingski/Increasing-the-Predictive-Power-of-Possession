@@ -456,3 +456,11 @@ def save_results():
         pickle.dump(results_baseline_raw, handle, protocol=pickle.HIGHEST_PROTOCOL)
     with open('results_baseline_status.pickle', 'wb') as handle:
         pickle.dump(results_baseline_status, handle, protocol=pickle.HIGHEST_PROTOCOL) 
+
+def calc_mean_r_squared_outer(best_results):
+    mean = 0
+    for score in best_results.values():
+        mean += score
+        
+    mean = mean/len(best_results.values())
+    print(np.round(mean, 3))

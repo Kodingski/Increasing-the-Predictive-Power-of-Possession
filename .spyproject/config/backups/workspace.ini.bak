@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['C:\\Users\\timsc\\.spyder-py3\\temp.py', 'create_github_data.py', 'Preprocessing\\preprocess_league.py', 'Chapter 3 - Data\\Section.py', 'utilities\\utils.py']
+recent_files = ['Chapter 7 - Results\\results_latex.py']
 
