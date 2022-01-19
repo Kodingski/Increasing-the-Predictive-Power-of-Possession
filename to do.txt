@@ -15,6 +15,7 @@ math
 matplotlib
 fuzzywuzzy
 
-Acknowledgements
+Acknowledgements - Done
+Update Readme - Done
 Upload Data 
 
