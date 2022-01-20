@@ -19,7 +19,17 @@ we analyze a teams performance over a whole season as well as individual match p
 
 The PDF containing the full thesis report can be found in this repository.
 
-## Dependencies
+## Requirements
+
+* numpy
+* pandas
+* sklearn
+* seaborn
+* scipy
+* pickle
+* shapely
+* matplotlib
+* fuzzywuzzy
 
 
 ## Data
