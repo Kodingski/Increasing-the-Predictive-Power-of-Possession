@@ -1,6 +1,9 @@
 # Increasing-the-Predictive-Power-of-Possession
 
-![Final model](./cover image.png)
+<p align="center">
+  <img width="460" height="300" src="./cover%20image.png">
+</p>
+
 
 This repository provides the code used to produce the results in my thesis project "Increasing the Predictive Power of the Possession Metric in Football by Adding Spatio-temporal Context" 
 submitted for the degree Master of Science Statistics: Data Science at Leiden University.
