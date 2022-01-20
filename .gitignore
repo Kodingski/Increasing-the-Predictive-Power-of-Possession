@@ -1,2 +1,5 @@
-Data/
-models/
+data/models
+data/perm test
+data/postprocessed
+data/preprocessed
+data/tags2name.csv
