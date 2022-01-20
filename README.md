@@ -3,7 +3,7 @@
 This repository provides the code used to produce the results in my thesis project "Increasing the Predictive Power of the Possession Metric in Football by Adding Spatio-temporal Context" 
 submitted for the degree Master of Science Statistics: Data Science at Leiden University.
 
-## Abstract:
+## Abstract
 In recent years, statistics play an increasing role in professional football.
 A controversial topic inside the emerging field of football data science is the effect of ball possession on match outcomes. 
 We contribute to this discussion by analyzing the effect of possession on match outcomes while controlling for match status and match-up balance. 
