@@ -11,7 +11,7 @@ path_preprocessed = 'data/preprocessed/'
 #path in which you store the downloaded model fits
 path_results = 'data/models/'
 #path in which you store the downloaded data postprocessed for application
-path_postprocessed ='data/postprocessed'
+path_postprocessed ='data/postprocessed/'
 
 
 def load_events(path_preprocessed = path_preprocessed, countries = ['Germany', 'Spain',
@@ -84,3 +84,8 @@ def load_test_even(path_results = path_results):
     with open(rf'{path_results}even/test_even.pickle', 'rb') as f:
        test_even = pickle.load(f)
     return test_even
+
+def load_postprocessed(path_postprocessed = path_postprocessed):
+    with open(rf'{path_postprocessed}matches_overview.pickle', 'rb') as f:
+       matches_overview = pickle.load(f)
+    return matches_overview    
