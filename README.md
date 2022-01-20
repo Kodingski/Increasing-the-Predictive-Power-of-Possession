@@ -21,16 +21,13 @@ The PDF containing the full thesis report can be found in this repository.
 
 ## Requirements
 
-* numpy
-* pandas
-* sklearn
-* seaborn
-* scipy
-* pickle
-* shapely
-* matplotlib
-* fuzzywuzzy
-
+* fuzzywuzzy==0.18.0
+* matplotlib==3.51
+* pandas==1.24
+* plotly==4.9
+* scikit-learn==0.241
+* seaborn==0.90
+* shapely==1.7.1
 
 ## Data
 The project is based on the data set ["A public data set of spatio-temporal match events in soccer competitions."](https://www.nature.com/articles/s41597-019-0247-7 "Data Descriptor").
