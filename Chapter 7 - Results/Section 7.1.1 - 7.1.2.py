@@ -15,6 +15,7 @@ from utilities.utils import *
 from utilities.fitting import *
 import warnings
 warnings.filterwarnings("ignore")
+
 #%% load all results dicts
 model, results = load_full_results()
 
@@ -73,8 +74,7 @@ full_long = long.append(rect_long)
 full_long[['Outer Fold', 'Inner Fold']] = full_long['Fold'].astype(str).str.split('.', 1, expand = True)
 
 #%%Figure 7.1 - Test Scores per Inner Loop for both zone types visualzied
-for name, group in full_long.groupby('Outer Fold'):
-    
+for name, group in full_long.reset_index().groupby('Outer Fold'):
     
     ax_fold = sns.lineplot(x = 'k', y = 'Val. Score', data = group, hue = 'Zone Type', ci=None,
              markers = True, style = 'Zone Type')
