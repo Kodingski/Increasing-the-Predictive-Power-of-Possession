@@ -16,6 +16,7 @@ from utilities.plot_utils import *
 
 #%%load match overview
 matches_overview = load_postprocessed()
+matches_overview = matches_overview.drop('matchId', axis = 1)
 
 #%%helper to calculate f statistic of Kolmogorov-Smirnov
 def calc_f(x):
@@ -27,7 +28,6 @@ def calc_f(x):
 #%%optimize f statistic for different values of scaling factor to find optimal factor
 optimization = scipy.optimize.minimize_scalar(calc_f)
 minimal_x = optimization['x']
-
 
 #%%add transformed pred to df
 matches_overview['pred Home trans'] = matches_overview['pred Home'].apply(lambda x : (1 / (1 + math.exp(-minimal_x*x))))

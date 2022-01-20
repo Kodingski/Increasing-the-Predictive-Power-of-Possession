@@ -3,16 +3,14 @@ import pandas as pd
 import pickle
 import os
 
-
-
-
 #path in which you store the downloade data preprocessed for eda and fitting
 path_preprocessed = 'data/preprocessed/'
 #path in which you store the downloaded model fits
 path_results = 'data/models/'
 #path in which you store the downloaded data postprocessed for application
 path_postprocessed ='data/postprocessed/'
-
+#path in which you store the permutation test results
+path_perms = 'data/perm test/'
 
 def load_events(path_preprocessed = path_preprocessed, countries = ['Germany', 'Spain',
                                    'Italy', 'England', 'France']):    
@@ -40,7 +38,7 @@ def load_passes(path_preprocessed = path_preprocessed, countries = ['Germany', '
     events = []
     
     for country in countries:
-        events_country = pd.read_json(rf'{path_preprocessed}events_{country}_thesis.json')
+        events_country = pd.read_json(rf'{path_preprocessed}events_{country}_preprocessed.json')
         events_country['country'] = country
         events.append(events_country)
     
@@ -89,3 +87,13 @@ def load_postprocessed(path_postprocessed = path_postprocessed):
     with open(rf'{path_postprocessed}matches_overview.pickle', 'rb') as f:
        matches_overview = pickle.load(f)
     return matches_overview    
+
+def load_perms(path_perms = path_perms):
+    perm_types = ['perms', 'perms_status', 'perms_drawing', 'perms_even', 'perms_even_drawing']
+    perms = dict.fromkeys(perm_types)
+    for perm_type in perm_types:
+        with open(rf'{path_perms}{perm_type}.pickle', 'rb') as f:
+            perms[perm_type] = pickle.load(f)
+
+    return perms
+    
