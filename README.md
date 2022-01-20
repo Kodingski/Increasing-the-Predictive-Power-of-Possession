@@ -1,7 +1,7 @@
 # Increasing-the-Predictive-Power-of-Possession
 
 <p align="center">
-  <img width="460" height="300" src="./cover%20image.png">
+  <img width="460" height="300" src="./cover_image.png">
 </p>
 
 
