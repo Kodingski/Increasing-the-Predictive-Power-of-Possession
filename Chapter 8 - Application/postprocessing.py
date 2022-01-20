@@ -11,127 +11,33 @@ Created on Thu Oct 21 16:19:26 2021
 
 @author: timsc
 """
+
 #%% imports
-import os
-import copy
 import numpy as np
-import pandas as pd
-import scipy.stats
-import seaborn as sns
-import matplotlib as plt
-import matplotlib.patches as patches
-import random
-import statsmodels.api as sm
-import pickle
-
-
-from scipy.spatial import Voronoi, voronoi_plot_2d
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
-from sklearn.cluster import KMeans
-from sklearn.model_selection import KFold
-from sklearn.linear_model import LinearRegression, ElasticNet
-from statsmodels.regression.linear_model import OLS
-from statsmodels.tools import add_constant
-
+import copy
 
 from utilities.utils import *
-from utilities.plot_utils import *
-from utilities.metrics import *
-
-#%% load data, merge and reduce to passes
-countries = ['Germany', 'Spain', 'Italy', 'England', 'France']
-
-#even_events = []
-events = []
-
-for country in countries:
-    events_country = pd.read_json(f'data/preprocessed/events_{country}_preprocessed.json')
-    events.append(events_country)
-
-del events_country
-
-events = pd.concat(events, axis=0, ignore_index=True)       
-
-#%%helpers
-def mirror_passes(passes):
-    passes_mirrored = passes.copy()
-    passes_mirrored['start_y'] = 100 - passes_mirrored['start_y']
-    passes_merged = passes.append(passes_mirrored)
-    return(passes_merged)
-    
-
-def assign_zones(passes, kmeans):
-
-    passes['zone'] = kmeans.predict(passes[['start_x', 'start_y']])       
-    
-    return(passes)
-
-def get_mean_poss_vector(passes, k, status = True):
-    
-    passes_home = passes[passes['home'] == passes['teamId']]
-    passes_away = passes[passes['home'] != passes['teamId']]
-    
-    
-    if status:
-        pass_count_per_zone_per_status_home = passes_home.groupby(['status','zone'])['eventId'].count().values
-        #rearrange to have trailing first
-        pass_count_per_zone_per_status_home = np.hstack(
-                                        (pass_count_per_zone_per_status_home[(2*k):(3*k)],
-                                        pass_count_per_zone_per_status_home[0:(2*k)])
-                                        )
-        
-        
-        pass_count_per_zone_per_status_away = passes_away.groupby(['status','zone'])['eventId'].count()
-        #rearrange to have trailing first
-        pass_count_per_zone_per_status_away = np.hstack(
-                                        (pass_count_per_zone_per_status_away[(k):(2*k)],
-                                        pass_count_per_zone_per_status_away[0:(k)],
-                                        pass_count_per_zone_per_status_away[(2*k):(3*k)])
-                                        )
-    
-        mean_poss_vector = pass_count_per_zone_per_status_home / (pass_count_per_zone_per_status_home +
-                                                             pass_count_per_zone_per_status_away)
-        
-    else:
-        pass_count_per_zone_home = passes_home.groupby(['zone'])['eventId'].count().values
-        pass_count_per_zone_away = passes_away.groupby(['zone'])['eventId'].count().values
-        
-        mean_poss_vector = pass_count_per_zone_home / (pass_count_per_zone_home +
-                                                             pass_count_per_zone_away)
-
-    return mean_poss_vector
+from utilities.model import *
+from utilities.zones import *
 
 
-#%%load results
-folder_results = 'results/final/'
+#%%load final model
+final_model = load_final_model()
 
-files = os.listdir(folder_results)
-results = {}
+#%%load matches
+matches = load_matches()
 
+#%% load passes and assign models zones
+passes = load_passes()
 
-for f in files:
-    if f == 'models.pickle':
-        models = pickle.load(open(folder_results+f, "rb"))
-    else:                        
-        results[str(f.rstrip('.pickle'))] = pickle.load(open(folder_results+f, "rb"))
-        
-
-final_zones, final_model = results['final_kmeans'], results['final_mod']      
-
-
-#%%
-passes = events[events['eventName'] == 'Pass']
+#mirror passes and reduce to bottom half
 passes = mirror_passes(passes)
 passes = passes[passes['start_y'] <= 50]
 
-passes = assign_zones(passes, final_zones)
+#assign zones based on kmeans of final model
+passes = assign_zones(passes, final_model['kmeans'])
 
-
-#%%create dataframe containing match id and X per match
-
-#%%
-
+#%%helper to prepare matches to input into model
 def prepare_matches(passes, mean_poss_vector, index_series, k):
     n = len(passes['matchId'].unique())
     
@@ -158,7 +64,7 @@ def prepare_matches(passes, mean_poss_vector, index_series, k):
         for name, passes_per_team_per_status in per_team_per_status:
             team, status = name[0], name[1]
     
-            counts_status = passes_per_team_per_status.groupby(['zone'])['eventId'].count()
+            counts_status = passes_per_team_per_status.groupby(['zone'])['id'].count()
     
             if team == home_team:
                 
@@ -221,40 +127,23 @@ def prepare_matches(passes, mean_poss_vector, index_series, k):
         
     return(X, match_info)
 
-
-#%%
-k = 11
-mean_poss_vector = get_mean_poss_vector(passes, k)
-
-#%%
-passes = assign_zones(passes, final_zones)
-
-#%%
+#%%Get models prediction for match
+#put passes into format of model input
 index_series = pd.Series(np.zeros(k), index = range(k))
 
 X, match_info = prepare_matches(passes, mean_poss_vector, index_series, k)
 
-#%%
-match_info[:,4] = final_model.predict(X)
+#predict matches with final model
+match_info[:,4] = final_model['model'].predict(X)
 
-#%%build dataframe
+#%%combine dataframe with models final prediction and the mean centred possession per zone
 matches_merged = np.hstack((match_info, X))
 zone_names = [status + ' ' + str(zone) for status in ['trailing', 'drawing', 'leading'] for zone in range(k)]
 
-
+#%%Create df enriched with match info
 matches_overview = pd.DataFrame(matches_merged, columns = (['matchId', 'home_score', 'away_score', 'raw poss. Home', 'pred Home'] + zone_names))
-
-#%%load matches 
-
-matches = pd.read_json(f"data\matches\matches_all_leagues_odds.json", encoding='unicode_escape')
-
-#%%
 matches_overview = pd.merge(matches[['wyId', 'label']], matches_overview, how = 'left', left_on = 'wyId', right_on = 'matchId')
-
 
 #%%save to pickle
 with open('matches_overview.pickle', 'wb') as handle:
-    pickle.dump(matches_overview, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    
-with open('mean_poss_vector.pickle', 'wb') as handle:
     pickle.dump(matches_overview, handle, protocol=pickle.HIGHEST_PROTOCOL)

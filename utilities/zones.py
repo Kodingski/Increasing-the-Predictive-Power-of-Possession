@@ -431,5 +431,8 @@ def get_mean_poss_per_zone(passes, k, kmeans = False):
 
 
 
+def assign_zones(passes, kmeans):
 
-
+    passes['zone'] = kmeans.predict(passes[['start_x', 'start_y']])       
+    
+    return(passes)

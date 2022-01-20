@@ -13,6 +13,7 @@ path_results = 'data/models/'
 #path in which you store the downloaded data postprocessed for application
 path_postprocessed ='data/postprocessed'
 
+
 def load_events(path_preprocessed = path_preprocessed, countries = ['Germany', 'Spain',
                                    'Italy', 'England', 'France']):    
     #load data, merge and reduce to passes
@@ -51,6 +52,10 @@ def load_passes(path_preprocessed = path_preprocessed, countries = ['Germany', '
     passes = events[events['eventName'] == 'Pass']
     return(passes)
 
+def load_matches(path_preprocessed = path_preprocessed):
+    with open(rf'{path_preprocessed}matches_preprocessed.json', 'rb') as f:
+       matches = pd.read_json(f)
+    return matches
 
 def load_final_model(path_results = path_results):
     model_parts = ['model', 'kmeans', 'mean_poss_vector']
