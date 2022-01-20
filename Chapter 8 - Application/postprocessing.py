@@ -20,7 +20,6 @@ from utilities.utils import *
 from utilities.model import *
 from utilities.zones import *
 
-
 #%%load final model
 final_model = load_final_model()
 
@@ -129,9 +128,10 @@ def prepare_matches(passes, mean_poss_vector, index_series, k):
 
 #%%Get models prediction for match
 #put passes into format of model input
+k = 11
 index_series = pd.Series(np.zeros(k), index = range(k))
 
-X, match_info = prepare_matches(passes, mean_poss_vector, index_series, k)
+X, match_info = prepare_matches(passes, final_model['mean_poss_vector'], index_series, k)
 
 #predict matches with final model
 match_info[:,4] = final_model['model'].predict(X)

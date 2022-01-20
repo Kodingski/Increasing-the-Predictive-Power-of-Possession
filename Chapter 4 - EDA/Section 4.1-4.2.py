@@ -76,10 +76,6 @@ def event_per_outcome_status(data, event = 'Pass'):
     
     return(status_dict)
 
-
-
-
-
 #%%Table 4.1 (passes per outcome)
 passes_per_outcome = event_per_outcome(passes)
 average_possession_outcome = (passes_per_outcome['lost']/ 

@@ -12,13 +12,10 @@ import seaborn as sns
 import matplotlib as plt
 from utilities.utils import *
 from utilities.plot_utils import *
-from utilities.metrics import *
-
 
 #%% load data and reduce to passes played in even matches
 passes = load_passes()
 passes_even = passes.loc[passes['muBalance'] == 'even']
-
 
 #%%define functions used in this chapter
 def plot_kde_event_on_field(data, sample_size=1000000, event = 'Pass', sub_events = False):
@@ -124,13 +121,10 @@ def get_rgb(weight):
     weight_stan = 1/(1+ np.exp(-(weight*20000)))
     return plt.cm.RdYlGn(weight_stan)
 
-
 #%% Create Figure 4.4 (KDE Winners and Losers seperately)
 #Sample size was set very high for final thesis run for maximal stability,
 #for quicker results put to default
 plot_kde_event_on_field(passes_even, sample_size=100000000, sub_events=False)
-
-
 
 #%% Create Figure 4.5 (Difference in KDES Winners and Losers)
 kde_winner, hist_winner, kde_loser, hist_loser = calc_kde(passes_even, sample_size = 1000000)

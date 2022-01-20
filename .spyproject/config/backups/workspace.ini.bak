@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['Chapter 8 - Application\\Application.py', 'Chapter 8 - Application\\prepare_data_application.py', 'Appendixes\\Appendix A - significance tests.py', 'Appendixes\\Appendix C - Full results N-CV.py', 'Appendixes\\Appendix B - KDE subtypes.py']
+recent_files = ['utilities\\utils.py', 'Chapter 8 - Application\\Section 8.2-8.3.py']
 

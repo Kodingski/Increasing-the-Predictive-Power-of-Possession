@@ -18,7 +18,7 @@ def load_events(path_preprocessed = path_preprocessed, countries = ['Germany', '
     events = []
     
     for country in countries:
-        events_country = pd.read_json(rf'{path}events_{country}_thesis.json')
+        events_country = pd.read_json(rf'{path_preprocessed}events_{country}_preprocessed.json')
         events_country['country'] = country
         events.append(events_country)
     
@@ -69,11 +69,12 @@ def load_full_results(path_results = path_results):
     files = os.listdir(rf'{path_results}full')
     results = {}
     
-    
     for f in files:
+        if '.ini' in f:
+            continue
         if f == 'models.pickle':
             models = pickle.load(open(rf'{path_results}full/{f}', "rb"))
-        else:                        
+        else: 
             results[str(f.rstrip('.pickle'))] = pickle.load(open(rf'{path_results}full/{f}', "rb"))
             
     return(models, results)

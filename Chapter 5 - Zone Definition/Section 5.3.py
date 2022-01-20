@@ -7,14 +7,9 @@ Created on Sun Sep 26 13:07:02 2021
 
 #%% imports
 from sklearn.cluster import KMeans
-
-
 from utilities.utils import *
 from utilities.plot_utils import *
-#For readibility purposes functions to produce zones and plots can be found in
-#utilities.zones and are imported here
 from utilities.zones import *
-
 
 #%% load data and reduce to passes of even matches
 passes = load_passes()
