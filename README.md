@@ -28,7 +28,7 @@ The project is based on the data set ["A public data set of spatio-temporal matc
 The code used to preprocess the raw data provided under the creative commons license into the data set used in this thesis is provided.
 For convenience, the preprocessed version of the data set used in this thesis, the results of the nested cross-validation in **Chapter 7**, the postprocessed data used for the application in **Chapter 8**, as well as the results of the Permutation test in **Appendix A** are provided [here](https://drive.google.com/drive/folders/1B9aaF8TcRx21tiJPoMrGMuPFYgDvzX4W?usp=sharing "Data Download").
 
-**Download the data, put it in folder \emph{data/} and you are good to go!**
+**Download the data, put it in folder data/ and you are good to go!**
 
 ## Structure
 The files are named by the chapters and sections of the report which results they reproduce.
